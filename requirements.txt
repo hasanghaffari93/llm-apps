@@ -1,0 +1,12 @@
+streamlit
+openai
+langchain
+langchain-community
+langchain-openai
+langchain-groq
+langgraph
+langgraph-checkpoint
+duckduckgo-search
+pypdf
+faiss-cpu
+transformers
