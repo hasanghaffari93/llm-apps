@@ -187,6 +187,10 @@ config = {"configurable": {"thread_id": "abc345"}}
 
 # Chat Interface
 
+def stream_wrapper(stream):
+    for chunk, _ in stream:
+        yield chunk.content
+        
 # Show chat History
 if chatbot and "messages" in chatbot.get_state(config).values:
     for msg in chatbot.get_state(config).values["messages"]:
@@ -200,9 +204,6 @@ if query := st.chat_input(disabled=not st.session_state["valid_auth"]):
         output = chatbot.invoke({"messages": input_messages}, config)
         st.chat_message(name="assistant").write(output["messages"][-1].content)
     else:
-        stream = chatbot.stream({"messages": input_messages}, config, stream_mode="messages")
-        with st.empty():
-            output = ""
-            for chunk, _ in stream:
-                output += chunk.content
-                st.chat_message(name="assistant").write(output)
+        output = chatbot.stream({"messages": input_messages}, config, stream_mode="messages")
+        st.chat_message(name="assistant").write(stream_wrapper(output))
+
