@@ -119,13 +119,24 @@ st.text_input(
     on_change=restart_chat,
 )
 
+max_tokens = st.number_input(
+    label="Trim messages if tokens exceed:",
+    min_value=10,
+    max_value=128000,
+    value=3000,
+    step=1000,
+    key="max_tokens", 
+    help="Long context costs a lot!",
+    placeholder="3000",
+    on_change=restart_chat,
+)
+
 stream_enabled = st.checkbox(
     label="Enable stream chat",
     value=True,
     key="stream",
     help="The output will be streaming",
 )
-
 
 prompt_template = ChatPromptTemplate.from_messages(
     [
@@ -138,7 +149,7 @@ prompt_template = ChatPromptTemplate.from_messages(
 )
 
 @st.cache_resource
-def app(api_provider, auth):
+def app(api_provider, auth, max_tokens):
 
     if not auth:
         return None
@@ -151,7 +162,7 @@ def app(api_provider, auth):
         pass
 
     trimmer = trim_messages(
-        max_tokens=1000,
+        max_tokens=max_tokens,
         strategy="last",
         token_counter=llm,
         include_system=True,
@@ -178,7 +189,7 @@ def app(api_provider, auth):
 
     return app
 
-chatbot = app(api_provider, auth)
+chatbot = app(api_provider, auth, max_tokens)
 
 config = {"configurable": {"thread_id": "abc345"}}
 
