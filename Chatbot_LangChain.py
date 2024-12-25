@@ -52,7 +52,7 @@ def validate_api_key(api_key: str, api_provider: str) -> bool:
 
 
 @st.cache_resource
-def create_chatbot(api_provider: str, api_key: str, max_tokens: int):
+def create_chatbot(api_provider: str, api_key: str, model_name: str, max_tokens: int):
 
     if not st.session_state["valid_auth"]:
         return None
@@ -182,7 +182,7 @@ prompt_template = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="messages"),
 ])
 
-chatbot = create_chatbot(api_provider, api_key, max_tokens)
+chatbot = create_chatbot(api_provider, api_key, model_name, max_tokens)
 config = {"configurable": {"thread_id": "abc345"}}
 
 # Chat Interface
