@@ -87,7 +87,7 @@ def create_chatbot(api_provider: str, auth: str, max_tokens: int):
 
 
 # UI Setup
-st.title("🤖 Chatbot with Langchain Framework")
+st.header("🤖 Chatbot with Langchain Framework")
 st.caption("🚀 Let's chat with different models using Langchain")
 
 # Sidebar Configuration
@@ -143,7 +143,6 @@ else:
 auth = st.sidebar.text_input(
     label=label,
     key="auth",
-    # on_change=restart_chat,
     type="password",
 )
 
