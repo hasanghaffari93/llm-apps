@@ -22,7 +22,7 @@ def restart_chat():
             {"role": "system", "content": st.session_state["system_prompt"]}
         ]
 
-st.title("🤖 Chatbot with OpenAI Library")
+st.header("🤖 Chatbot with OpenAI Library")
 st.caption("🚀 Let's chat with different models using OpenAI's client libraries")
 
 
