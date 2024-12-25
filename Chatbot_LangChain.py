@@ -109,6 +109,27 @@ model_name = st.sidebar.selectbox(
     on_change=restart_chat,
 )
 
+max_tokens = st.sidebar.number_input(
+    label="Trim messages if tokens exceed:",
+    min_value=10,
+    max_value=128000,
+    value=AppConfig.DEFAULT_MAX_TOKENS,
+    step=1000,
+    key="max_tokens", 
+    help="Long context costs a lot!",
+    placeholder="3000",
+    on_change=restart_chat,
+)
+
+stream_enabled = st.sidebar.checkbox(
+    label="Enable stream chat",
+    value=True,
+    key="stream",
+    help="The output will be streaming",
+)
+
+st.sidebar.divider()
+
 auth_type = st.sidebar.radio(
     "How would you like to authenticate?",
     ["Use an API Key", "Use a Password"],
@@ -155,24 +176,6 @@ st.text_input(
     on_change=restart_chat,
 )
 
-max_tokens = st.number_input(
-    label="Trim messages if tokens exceed:",
-    min_value=10,
-    max_value=128000,
-    value=AppConfig.DEFAULT_MAX_TOKENS,
-    step=1000,
-    key="max_tokens", 
-    help="Long context costs a lot!",
-    placeholder="3000",
-    on_change=restart_chat,
-)
-
-stream_enabled = st.checkbox(
-    label="Enable stream chat",
-    value=True,
-    key="stream",
-    help="The output will be streaming",
-)
 
 prompt_template = ChatPromptTemplate.from_messages([
     ("system", st.session_state["system_prompt"]),
