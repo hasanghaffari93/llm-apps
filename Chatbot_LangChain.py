@@ -186,8 +186,8 @@ chatbot = create_chatbot(api_provider, auth, max_tokens)
 config = {"configurable": {"thread_id": "abc345"}}
 
 # Chat Interface
-st.chat_message(name='assistant', avatar="🤖").write(st.session_state["system_prompt"])
 
+# Show chat History
 if chatbot and "messages" in chatbot.get_state(config).values:
     for msg in chatbot.get_state(config).values["messages"]:
         st.chat_message(msg.type).write(msg.content)
