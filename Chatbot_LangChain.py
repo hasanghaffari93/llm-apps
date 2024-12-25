@@ -52,13 +52,13 @@ def validate_api_key(api_key: str, api_provider: str) -> bool:
 
 
 @st.cache_resource
-def create_chatbot(api_provider: str, auth: str, max_tokens: int):
+def create_chatbot(api_provider: str, api_key: str, max_tokens: int):
 
-    if not auth:
+    if not st.session_state["valid_auth"]:
         return None
 
-    llm = ChatOpenAI(model=model_name, api_key=api_key, max_tokens=1000) if api_provider == "OpenAI" \
-        else ChatGroq(model=model_name, api_key=api_key, max_tokens=1000)
+    llm = ChatOpenAI(model=model_name, api_key=api_key) if api_provider == "OpenAI" \
+        else ChatGroq(model=model_name, api_key=api_key)
 
     trimmer = trim_messages(
         max_tokens=max_tokens,
@@ -148,6 +148,7 @@ auth = st.sidebar.text_input(
 
 st.session_state["valid_auth"] = False
 
+api_key = ""
 if auth_type == "Use an API Key":
     if validate_api_key(auth, api_provider):
         api_key = auth
@@ -181,7 +182,7 @@ prompt_template = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="messages"),
 ])
 
-chatbot = create_chatbot(api_provider, auth, max_tokens)
+chatbot = create_chatbot(api_provider, api_key, max_tokens)
 config = {"configurable": {"thread_id": "abc345"}}
 
 # Chat Interface
