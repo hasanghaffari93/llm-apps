@@ -43,7 +43,9 @@ pip install -r requirements.txt
 streamlit run Chatbot_LangChain.py
 ```
 
-## 💡 Usage
+## 💡 Demo App 
+
+[![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://chatbot-apps.streamlit.app/)
 
 1. Select your preferred API provider (OpenAI/Groq)
 2. Choose a model
