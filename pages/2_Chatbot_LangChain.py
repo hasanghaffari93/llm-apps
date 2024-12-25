@@ -1,4 +1,5 @@
 import streamlit as st
+import openai
 from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -8,6 +9,7 @@ from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages, RemoveMessage
 from typing import Annotated, Sequence
 from typing_extensions import TypedDict
+
 
 # Constants
 API_PROVIDERS = ('OpenAI', 'Groq')
@@ -26,63 +28,104 @@ KEY_NAMES = {
 
 
 def restart_chat():
-    messages = chatbot.get_state(config).values["messages"]
-    chatbot.update_state(config, {"messages": [RemoveMessage(id=m.id) for m in messages]})
+    if chatbot:
+        if chatbot.get_state(config).values:
+            messages = chatbot.get_state(config).values["messages"]
+            chatbot.update_state(config, {"messages": [RemoveMessage(id=m.id) for m in messages]})
 
 
 st.title("🤖 Chatbot with Langchain Framework")
 st.caption("🚀 Let's chat with different models using Langchain")
 
-# Layout
-col1, col2 = st.columns(2)
 
-with col1:
-    api_provider = st.selectbox(
-        label="Which API do you want to use?",
-        options=API_PROVIDERS,
-        index=0,
-        key="api_provider",
-        help="This app has API key of these providers",
-        placeholder="Select an API...",
-        on_change=restart_chat,
-    )
+# Sidebar
+api_provider = st.sidebar.selectbox(
+    label="Which API do you want to use?",
+    options=API_PROVIDERS,
+    index=0,
+    key="api_provider",
+    placeholder="Select an API...",
+    on_change=restart_chat,
+)
 
-    if api_provider:
-        model_name = st.selectbox(
-            label="Which model do you want to use?",
-            options=MODEL_NAMES[api_provider],
-            index=0,
-            key="model_name",
-            help="This app has API key of these model",
-            placeholder="Select a model...",
-            on_change=restart_chat,
-        )
+model_name = st.sidebar.selectbox(
+    label="Which model do you want to use?",
+    options=MODEL_NAMES[api_provider],
+    index=0,
+    key="model_name",
+    placeholder="Select a model...",
+    on_change=restart_chat,
+)
 
-with col2:
-    st.text_input(
-        label="System Prompt:",
-        value="You are a helpful assistant.",
-        max_chars=100,
-        key="system_prompt",
-        help="Top-level instructions for the model's behavior",
-        placeholder="System Prompt",
-        on_change=restart_chat,
-    )
+auth_type = st.sidebar.radio(
+    "How would you like to authenticate?",
+    ["Use an API Key", "Use a Password"],
+)
 
-    stream_enabled = st.checkbox(
-        label="Enable stream chat",
-        value=True,
-        key="stream",
-        help="The output will be streaming",
-    )
-
-
-if api_provider == "OpenAI":
-    llm = ChatOpenAI(model=model_name, api_key=st.secrets[KEY_NAMES[api_provider]], max_tokens=1000)
-elif api_provider == "Groq":
-    llm = ChatGroq(model=model_name, api_key=st.secrets[KEY_NAMES[api_provider]])
+if auth_type == "Use an API Key":
+    label = "{} API Key:".format(api_provider)
 else:
-    pass
+    label = "Password:"
+
+auth = st.sidebar.text_input(
+    label=label,
+    key="auth",
+    # on_change=restart_chat,
+    type="password",
+)
+
+@st.cache_data()
+def check_openai_api_key(api_key):
+    client = openai.OpenAI(
+        base_url=BASE_URLS[api_provider],
+        api_key=api_key,
+    )
+    try:
+        models = client.models.list()
+    except openai.AuthenticationError:
+        return False
+    except Exception as error:
+        st.sidebar.error(error)
+    else:
+        return True
+    
+
+st.session_state["valid_auth"] = False
+
+if auth_type == "Use an API Key":
+    if check_openai_api_key(auth):
+        api_key = auth
+        st.session_state["valid_auth"] = True
+        st.sidebar.success("Valid API key")
+    else:
+        st.sidebar.error("Invalid API key")
+else:
+    if auth in st.secrets["PASSWORDS"]:
+        api_key = st.secrets[KEY_NAMES[api_provider]]
+        st.session_state["valid_auth"] = True
+        st.sidebar.success("Valid password")
+    else:
+        st.sidebar.error("Invalid password")
+
+
+# Layout
+st.text_input(
+    label="System Prompt:",
+    value="You are a helpful assistant.",
+    max_chars=1000,
+    key="system_prompt",
+    help="Top-level instructions for the model's behavior",
+    placeholder="System Prompt",
+    on_change=restart_chat,
+)
+
+stream_enabled = st.checkbox(
+    label="Enable stream chat",
+    value=True,
+    key="stream",
+    help="The output will be streaming",
+)
+
 
 prompt_template = ChatPromptTemplate.from_messages(
     [
@@ -94,17 +137,27 @@ prompt_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-trimmer = trim_messages(
-    max_tokens=1000,
-    strategy="last",
-    token_counter=llm,
-    include_system=True,
-    allow_partial=False,
-    start_on="human",
-)
-
 @st.cache_resource
-def app():
+def app(api_provider, auth):
+
+    if not auth:
+        return None
+
+    if api_provider == "OpenAI":
+        llm = ChatOpenAI(model=model_name, api_key=api_key, max_tokens=1000)
+    elif api_provider == "Groq":
+        llm = ChatGroq(model=model_name, api_key=api_key, max_tokens=1000)
+    else:
+        pass
+
+    trimmer = trim_messages(
+        max_tokens=1000,
+        strategy="last",
+        token_counter=llm,
+        include_system=True,
+        allow_partial=False,
+        start_on="human",
+    )    
 
     class State(TypedDict):
         messages: Annotated[Sequence[BaseMessage], add_messages]
@@ -125,7 +178,7 @@ def app():
 
     return app
 
-chatbot = app()
+chatbot = app(api_provider, auth)
 
 config = {"configurable": {"thread_id": "abc345"}}
 
@@ -135,15 +188,15 @@ st.chat_message(name='assistant', avatar="🤖").write(
     st.session_state["system_prompt"]
 )
 
-
 # Display chat history
-if "messages" in chatbot.get_state(config).values:
-    for msg in chatbot.get_state(config).values["messages"]:
-        st.chat_message(msg.type).write(msg.content)
+if chatbot:
+    if "messages" in chatbot.get_state(config).values:
+        for msg in chatbot.get_state(config).values["messages"]:
+            st.chat_message(msg.type).write(msg.content)
 
 
 # Handle new messages
-if query := st.chat_input():
+if query := st.chat_input(disabled=not st.session_state["valid_auth"]):
 
     st.chat_message(name="human").write(query)
 
