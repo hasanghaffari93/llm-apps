@@ -87,8 +87,8 @@ def create_chatbot(api_provider: str, api_key: str, max_tokens: int):
 
 
 # UI Setup
-st.header("🤖 Chatbot with Langchain Framework")
-st.caption("🚀 Let's chat with different models using Langchain")
+st.header("🤖 Chatbot")
+st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
 
 # Sidebar Configuration
 api_provider = st.sidebar.selectbox(
