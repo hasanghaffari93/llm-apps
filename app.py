@@ -11,14 +11,14 @@ import streamlit as st
 
 pg = st.navigation({
     "Chatbots": [
-        st.Page("pages/0_Chatbot_LangChain.py", title="Chatbot Langchain", icon=":material/dashboard:")
+        st.Page("modules/0_Chatbot_LangChain.py", title="Chatbot Langchain", icon=":material/dashboard:")
     ],
     "Summarization": [
-        st.Page("pages/1_Summarization_Stuff.py", title="Stuff Technique", icon=":material/dashboard:"),
-        st.Page("pages/2_Summarization_Map_Reduce.py", title="Map-Reduce Technique", icon=":material/dashboard:")
+        st.Page("modules/1_Summarization_Stuff.py", title="Stuff Technique", icon=":material/dashboard:"),
+        st.Page("modules/2_Summarization_Map_Reduce.py", title="Map-Reduce Technique", icon=":material/dashboard:")
     ],
     "RAG": [
-        st.Page("pages/3_RAG.py", title="PDF Q/A", icon=":material/dashboard:")
+        st.Page("modules/3_RAG.py", title="PDF Q/A", icon=":material/dashboard:")
     ]
 })
 
