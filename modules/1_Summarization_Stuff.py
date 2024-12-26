@@ -111,7 +111,7 @@ chain = load_chain(llm)
 container = st.container(border=True)
 container.write("Summary:")
 
-if stream_enabled:
+if st.session_state["stream"]:
     stream = chain.stream({"context": doc.page_content})
     container.write_stream(stream)
 else:

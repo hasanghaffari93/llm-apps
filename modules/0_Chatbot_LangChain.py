@@ -92,7 +92,7 @@ if query := st.chat_input(disabled=not st.session_state["valid_auth"]):
     st.chat_message(name="human").write(query)
     input_messages = [HumanMessage(query)]
 
-    if not st.session_state["stream_enabled"]:
+    if not st.session_state["stream"]:
         output = chatbot.invoke({"messages": input_messages}, config)
         st.chat_message(name="assistant").write(output["messages"][-1].content)
     else:

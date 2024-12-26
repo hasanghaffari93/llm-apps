@@ -58,7 +58,7 @@ async def summarize():
 
     app = load_agent()
 
-    if stream_enabled:
+    if st.session_state["stream"]:
         stream = app.astream(
         {"contents": [doc.page_content for doc in doc_splits]},
         config=config,

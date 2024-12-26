@@ -167,7 +167,7 @@ def stream_wrapper(stream):
 if question := st.chat_input(disabled=not st.session_state["valid_auth"]):
     st.chat_message(name="human").write(question)
 
-    if not stream_enabled:
+    if not st.session_state["stream"]:
         response = graph.invoke({"question": question})
         st.chat_message(name="assistant").write(response["answer"])
     else:
