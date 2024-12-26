@@ -95,7 +95,7 @@ def validate_api_key(api_key: str, api: str) -> bool:
     except openai.AuthenticationError:
         return False
     except Exception as error:
-        st.sidebar.error(str(error))
+        st.sidebar.error(f"API error: {error}")
         return False
     
 
