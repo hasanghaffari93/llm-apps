@@ -25,57 +25,62 @@ class AppConfig:
 
 def select_api_and_model(
         api_provider: Optional[tuple[str, ...]]=None, 
-        on_change: Optional[Callable]=None) -> None:
+        on_change: Optional[Callable]=None
+    ) -> None:
 
-    st.sidebar.selectbox(
-        label="Select API provider",
-        options=AppConfig.API_PROVIDERS if api_provider is None else api_provider,
-        index=0,
-        key="api",
-        on_change=on_change,
-    )
+    with st.sidebar.expander("Select API and Model"):
+        st.selectbox(
+            label="API provider",
+            options=AppConfig.API_PROVIDERS if api_provider is None else api_provider,
+            index=0,
+            key="api",
+            on_change=on_change,
+        )
 
-    st.sidebar.selectbox(
-        label="Select model name",
-        options=AppConfig.MODEL_NAMES[st.session_state["api"]],
-        index=0,
-        key="model",
-        on_change=on_change,
-    )
+        st.selectbox(
+            label="model name",
+            options=AppConfig.MODEL_NAMES[st.session_state["api"]],
+            index=0,
+            key="model",
+            on_change=on_change,
+        )
 
 def authenticate():
-    auth_type = st.sidebar.radio(
-        "Authenticate via",
-        ["Your API Key", "Password"],
-        key="auth_type",
-        horizontal=True,
-    )
+    with st.sidebar.popover("Enter API Key or Password", use_container_width=True):
+        auth_type = st.radio(
+            "Authenticate via",
+            ["Your API Key", "Password"],
+            key="auth_type",
+            horizontal=True,
+            label_visibility="collapsed",
+            captions=["Use your own API key", "Use a password provided by the author for testing"],
+        )
 
-    label = f"{st.session_state['api']} API Key:" if auth_type == "Your API Key" else "Password:"
-    
-    auth_input = st.sidebar.text_input(
-        label=label,
-        key="auth",
-        type="password",
-    )
+        label = f"{st.session_state['api']} API Key:" if auth_type == "Your API Key" else "Password:"
+        
+        auth_input = st.text_input(
+            label=label,
+            key="auth",
+            type="password",
+        )
 
-    st.session_state["valid_auth"] = False
-    st.session_state["api_key"] = ""
+        st.session_state["valid_auth"] = False
+        st.session_state["api_key"] = ""
 
-    if auth_type == "Your API Key":
-        if validate_api_key(auth_input, st.session_state["api"]):
-            st.session_state["api_key"] = auth_input
-            st.session_state["valid_auth"] = True
-            st.sidebar.success("Valid API key")
+        if auth_type == "Your API Key":
+            if validate_api_key(auth_input, st.session_state["api"]):
+                st.session_state["api_key"] = auth_input
+                st.session_state["valid_auth"] = True
+                st.sidebar.success("Valid API key")
+            else:
+                st.sidebar.error("Invalid API key")
         else:
-            st.sidebar.error("Invalid API key")
-    else:
-        if auth_input in st.secrets["PASSWORDS"]:
-            st.session_state["api_key"] = st.secrets[AppConfig.KEY_NAMES[st.session_state["api"]]]
-            st.session_state["valid_auth"] = True
-            st.sidebar.success("Valid password")
-        else:
-            st.sidebar.error("Invalid password")
+            if auth_input in st.secrets["PASSWORDS"]:
+                st.session_state["api_key"] = st.secrets[AppConfig.KEY_NAMES[st.session_state["api"]]]
+                st.session_state["valid_auth"] = True
+                st.sidebar.success("Valid password")
+            else:
+                st.sidebar.error("Invalid password")
 
 
 @st.cache_data()
@@ -139,16 +144,13 @@ def get_system_prompt(on_change: Optional[Callable]=None) -> None:
         on_change=on_change,
     )
 
-def select_embedding_model():
-    st.sidebar.selectbox(
-        label="OpenAI embedding model",
-        options=AppConfig.EMBEDDING_MODEL_NAMES["OpenAI"],
-        index=0,
-        key="embedding_model",
-        help="This app has API key of these model",
-        placeholder="Select an embedding model...",
-        disabled=False,
-        label_visibility="visible",  #"visible", "hidden", or "collapsed"
-        # on_change=restart_chat,
-    )
+def select_embedding_model(on_change: Optional[Callable]=None) -> None:
+    with st.sidebar.expander("Select Embedding Eodel"):
+        st.selectbox(
+            label="OpenAI Embedding Model",
+            options=AppConfig.EMBEDDING_MODEL_NAMES["OpenAI"],
+            index=0,
+            key="embedding_model",
+            on_change=on_change,
+        )
     

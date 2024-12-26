@@ -49,7 +49,6 @@ select_api_and_model("OpenAI")
 select_embedding_model()
 authenticate()
 get_context_length_limit()
-st.sidebar.divider()
 stream_enabled()
 
 

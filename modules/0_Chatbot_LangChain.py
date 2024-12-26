@@ -64,7 +64,6 @@ get_system_prompt(restart_chat)
 select_api_and_model(on_change=restart_chat)
 authenticate()
 get_max_tokens()
-st.sidebar.divider()
 stream_enabled()
 
 

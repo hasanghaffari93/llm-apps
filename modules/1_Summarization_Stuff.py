@@ -66,7 +66,6 @@ st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Stream
 # Sidebar
 select_api_and_model()
 authenticate()
-st.sidebar.divider()
 get_context_length_limit()
 stream_enabled()
 
