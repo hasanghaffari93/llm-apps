@@ -10,19 +10,13 @@ from langchain_groq import ChatGroq
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from agents.summarizer import load_agent
-from utils import get_context_length_limit, select_api_and_model, authenticate, stream_enabled
+from utils import get_context_length_limit, update_api_and_model, authenticate, stream_enabled
 
 
-@st.cache_resource
+@st.cache_resource(max_entries=1)
 def load_llm(api: str, api_key: str, model: str):
-
-    if not st.session_state["valid_auth"]:
-        return None
-    
-    llm = ChatOpenAI(model=model, api_key=api_key) if api == "OpenAI" \
+    return ChatOpenAI(model=model, api_key=api_key) if api == "OpenAI" \
         else ChatGroq(model=model, api_key=api_key)
-
-    return llm
 
 
 def combine_documents(docs: List[Document]) -> str:
@@ -33,7 +27,7 @@ def get_context_length(doc):
     return llm.get_num_tokens(doc.page_content)
     
 
-@st.cache_data
+@st.cache_data(max_entries=1)
 def load_and_split_pdf(pdf_file):
 
     temp_dir = tempfile.TemporaryDirectory()
@@ -54,11 +48,11 @@ def load_and_split_pdf(pdf_file):
 
     return doc_splits
 
-async def summarize():
+async def summarize(is_stream):
 
     app = load_agent()
 
-    if st.session_state["stream"]:
+    if is_stream:
         stream = app.astream(
         {"contents": [doc.page_content for doc in doc_splits]},
         config=config,
@@ -83,16 +77,12 @@ st.header("🤖 Large Document Summarization (Map-Reduce)")
 st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
 
 # Sidebar
-select_api_and_model()
+model = update_api_and_model() # Run on_change then rerun!
 authenticate()
-get_context_length_limit()
-stream_enabled()
+context_length_limit = get_context_length_limit()
+is_stream = stream_enabled()
 
-llm = load_llm(
-    st.session_state["api"], 
-    st.session_state["api_key"], 
-    st.session_state["model"]
-)
+llm = load_llm(st.session_state.api, st.session_state.api_key, model)
 
 config = {
     "recursion_limit": 10,
@@ -106,7 +96,7 @@ uploaded_pdf = st.file_uploader(
     label='Choose your .pdf file',
     type="pdf",
     accept_multiple_files=False,
-    key="uploaded_pdf",
+    disabled=not st.session_state["valid_auth"]
 )
 
 if not uploaded_pdf:
@@ -116,9 +106,7 @@ if not uploaded_pdf:
 doc_splits = load_and_split_pdf(uploaded_pdf)
 
 
-# When code is conditioned on a button's value, it will execute once in response to the button being clicked
-# and not again (until the button is clicked again).
-start_summarize = st.button("summarize", type="primary", disabled=not llm)
+start_summarize = st.button("summarize", type="primary", disabled=not st.session_state["valid_auth"])
 if not start_summarize:
     st.info('Click on summarize', icon="🚨")
     st.stop()
@@ -127,6 +115,6 @@ if not start_summarize:
 with st.spinner('Summarizing...'):
     container = st.container(border=True)
     container.write("Summary:")
-    asyncio.run(summarize())
+    asyncio.run(summarize(is_stream))
 
 st.success("Summarization finished!", icon="✅")

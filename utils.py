@@ -22,68 +22,82 @@ class AppConfig:
     DEFAULT_MAX_TOKENS = 3000
     DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant."
 
+def reset_auth():
+    if st.session_state.valid_auth:
+        if not st.session_state.password_auth:
+            st.session_state.valid_auth = False
+        else:
+            st.session_state.api_key = st.secrets[AppConfig.KEY_NAMES[st.session_state.api]]
 
-def select_api_and_model(
-        api_provider: Optional[tuple[str, ...]]=None, 
-        on_change: Optional[Callable]=None
-    ) -> None:
+def update_api_and_model(from_api=None):
 
     with st.sidebar.expander("Select API and Model"):
-        st.selectbox(
+        st.session_state.api = st.selectbox(
             label="API provider",
-            options=AppConfig.API_PROVIDERS if api_provider is None else api_provider,
+            options=AppConfig.API_PROVIDERS if from_api is None else from_api,
             index=0,
-            key="api",
-            on_change=on_change,
+            on_change=reset_auth(),
         )
 
-        st.selectbox(
+        model = st.selectbox(
             label="model name",
-            options=AppConfig.MODEL_NAMES[st.session_state["api"]],
+            options=AppConfig.MODEL_NAMES[st.session_state.api],
             index=0,
-            key="model",
-            on_change=on_change,
+            # key="model",
+            # on_change=on_change,
         )
+
+    return model
 
 def authenticate():
-    with st.sidebar.popover("Enter API Key or Password", use_container_width=True):
+    
+    with st.sidebar.expander("Enter API Key or Password", expanded=not st.session_state.valid_auth):
+
         auth_type = st.radio(
             "Authenticate via",
             ["Your API Key", "Password"],
-            key="auth_type",
+            # key="auth_type",
             horizontal=True,
             label_visibility="collapsed",
             captions=["Use your own API key", "Use a password provided by the author for testing"],
+            disabled=st.session_state.valid_auth
         )
 
-        label = f"{st.session_state['api']} API Key:" if auth_type == "Your API Key" else "Password:"
+        label = f"{st.session_state.api} API Key:" if auth_type == "Your API Key" else "Password:"
         
         auth_input = st.text_input(
             label=label,
-            key="auth",
             type="password",
+            disabled=st.session_state.valid_auth
         )
 
-        st.session_state["valid_auth"] = False
-        st.session_state["api_key"] = ""
+        button = st.button('Submit', disabled=st.session_state.valid_auth)
 
-        if auth_type == "Your API Key":
-            if validate_api_key(auth_input, st.session_state["api"]):
-                st.session_state["api_key"] = auth_input
-                st.session_state["valid_auth"] = True
-                st.sidebar.success("Valid API key")
+        if button and not st.session_state.valid_auth:
+            
+            if auth_type == "Your API Key":
+                if validate_api_key(auth_input, st.session_state.api):
+                    st.session_state.api_key = auth_input
+                    st.session_state.valid_auth = True
+                    st.session_state.password_auth= False
+                    st.rerun()
+                else:
+                    st.sidebar.error("Invalid API key")
             else:
-                st.sidebar.error("Invalid API key")
-        else:
-            if auth_input in st.secrets["PASSWORDS"]:
-                st.session_state["api_key"] = st.secrets[AppConfig.KEY_NAMES[st.session_state["api"]]]
-                st.session_state["valid_auth"] = True
-                st.sidebar.success("Valid password")
-            else:
-                st.sidebar.error("Invalid password")
+                if auth_input in st.secrets["PASSWORDS"]:
+                    st.session_state.api_key = st.secrets[AppConfig.KEY_NAMES[st.session_state.api]]
+                    st.session_state.valid_auth = True
+                    st.session_state.password_auth= True
+                    st.rerun()
+                else:
+                    st.sidebar.error("Invalid password")
+
+    if st.session_state.valid_auth:
+        st.sidebar.success("Valid authentication")
+    else:
+        st.error("Validate your authentication")                    
 
 
-@st.cache_data()
 def validate_api_key(api_key: str, api: str) -> bool:
     try:
         client = openai.OpenAI(
@@ -100,20 +114,21 @@ def validate_api_key(api_key: str, api: str) -> bool:
     
 
 def get_max_tokens(on_change: Optional[Callable]=None) -> None:
-    st.sidebar.number_input(
+    max_tokens = st.sidebar.number_input(
         label="Trim messages if tokens exceed:",
         min_value=10,
         max_value=128000,
         value=AppConfig.DEFAULT_MAX_TOKENS,
         step=1000,
-        key="max_tokens",
+        # key="max_tokens",
         help="Long context costs a lot!",
         placeholder="3000",
         on_change=on_change,
-)
+    )
+    return max_tokens
 
 def get_context_length_limit(on_change: Optional[Callable]=None) -> None:
-    st.sidebar.number_input(
+    context_length_limit = st.sidebar.number_input(
         label="Context length limit:",
         min_value=10,
         max_value=128000,
@@ -124,25 +139,27 @@ def get_context_length_limit(on_change: Optional[Callable]=None) -> None:
         placeholder="3000",
         on_change=on_change,
     )
+    return context_length_limit
 
 def stream_enabled():
-    st.sidebar.checkbox(
+    stream = st.sidebar.checkbox(
         label="Enable stream chat",
         value=True,
-        key="stream",
         help="The output will be streaming",
     )
+    return stream
 
-def get_system_prompt(on_change: Optional[Callable]=None) -> None:
-    st.text_input(
+def get_system_prompt(on_change: Optional[Callable]=None, args=None) -> None:
+    system_prompt = st.text_input(
         label="System Prompt:",
         value=AppConfig.DEFAULT_SYSTEM_PROMPT,
         max_chars=1000,
-        key="system_prompt",
         help="Top-level instructions for the model's behavior",
         placeholder="System Prompt",
         on_change=on_change,
+        args=args
     )
+    return system_prompt
 
 def select_embedding_model(on_change: Optional[Callable]=None) -> None:
     with st.sidebar.expander("Select Embedding Eodel"):

@@ -14,22 +14,16 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langgraph.graph import START, StateGraph
-from utils import get_context_length_limit, select_api_and_model, authenticate, stream_enabled, select_embedding_model
+from utils import get_context_length_limit, update_api_and_model, authenticate, stream_enabled, select_embedding_model
 
 
-@st.cache_resource
+@st.cache_resource(max_entries=1)
 def load_llm(api: str, api_key: str, model: str):
-
-    if not st.session_state["valid_auth"]:
-        return None
-
-    llm = ChatOpenAI(model=model, api_key=api_key) if api == "OpenAI" \
+    return ChatOpenAI(model=model, api_key=api_key) if api == "OpenAI" \
         else ChatGroq(model=model, api_key=api_key)
-    
-    return llm
 
 
-@st.cache_resource
+@st.cache_resource(max_entries=1)
 def load_embedding(api_key: str, embedding_model: str):
 
     if not st.session_state["valid_auth"]:
@@ -39,40 +33,7 @@ def load_embedding(api_key: str, embedding_model: str):
     
     return embeddings
 
-
-# UI Setup
-st.header("🤖 RAG")
-st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
-
-# Sidebar
-select_api_and_model("OpenAI")
-select_embedding_model()
-authenticate()
-get_context_length_limit()
-stream_enabled()
-
-
-llm = load_llm(
-    st.session_state["api"], 
-    st.session_state["api_key"], 
-    st.session_state["model"]
-)
-
-
-uploaded_pdf = st.file_uploader(
-    label='Choose your .pdf file',
-    type="pdf",
-    accept_multiple_files =False,
-    key="uploaded_pdf",
-)
-
-
-if not uploaded_pdf:
-    st.info("Please upload a PDF document to continue.")
-    st.stop()
-
-
-@st.cache_resource()
+@st.cache_resource(max_entries=1)
 def configure_retriever(uploaded_pdf):
 
     # Read documents
@@ -113,11 +74,10 @@ def configure_retriever(uploaded_pdf):
 
     return vector_store
 
-vector_store = configure_retriever(uploaded_pdf)
-
-
-@st.cache_resource
+@st.cache_resource(max_entries=1)
 def app():
+
+    llm = load_llm(st.session_state.api, st.session_state.api_key, model)
 
     template = """
     You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
@@ -157,16 +117,40 @@ def app():
 
     return app
 
-graph = app()
-
 def stream_wrapper(stream):
     for chunk, _ in stream:
         yield chunk.content
+
+# UI Setup
+st.header("🤖 RAG")
+st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
+
+# Sidebar
+model = update_api_and_model("OpenAI")
+select_embedding_model()
+authenticate()
+context_length_limit = get_context_length_limit()
+is_stream = stream_enabled()
+
+uploaded_pdf = st.file_uploader(
+    label='Choose your .pdf file',
+    type="pdf",
+    accept_multiple_files =False,
+    disabled=not st.session_state["valid_auth"]
+)
+
+if not uploaded_pdf:
+    st.info("Please upload a PDF document to continue.")
+    st.stop()
+
+vector_store = configure_retriever(uploaded_pdf)
+
+graph = app()
     
 if question := st.chat_input(disabled=not st.session_state["valid_auth"]):
     st.chat_message(name="human").write(question)
 
-    if not st.session_state["stream"]:
+    if not is_stream:
         response = graph.invoke({"question": question})
         st.chat_message(name="assistant").write(response["answer"])
     else:
