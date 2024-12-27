@@ -82,16 +82,6 @@ authenticate()
 context_length_limit = get_context_length_limit()
 is_stream = stream_enabled()
 
-llm = load_llm(st.session_state.api, st.session_state.api_key, model)
-
-config = {
-    "recursion_limit": 10,
-    "configurable": {
-        "llm": llm,
-        "token_max": st.session_state["context_length_limit"]
-    }
-}
-
 uploaded_pdf = st.file_uploader(
     label='Choose your .pdf file',
     type="pdf",
@@ -111,6 +101,15 @@ if not start_summarize:
     st.info('Click on summarize', icon="🚨")
     st.stop()
 
+llm = load_llm(st.session_state.api, st.session_state.api_key, model)
+
+config = {
+    "recursion_limit": 10,
+    "configurable": {
+        "llm": llm,
+        "token_max": st.session_state["context_length_limit"]
+    }
+}
 
 with st.spinner('Summarizing...'):
     container = st.container(border=True)
