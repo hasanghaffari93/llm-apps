@@ -73,6 +73,9 @@ chatbot = create_chatbot(st.session_state.api, st.session_state.api_key, model, 
 
 config = {"configurable": {"thread_id": "abc345"}}
 
+if st.sidebar.button("New Chat", disabled=not st.session_state["valid_auth"]):
+    clear_chat_history(chatbot, config)
+
 system_prompt = get_system_prompt(on_change=clear_chat_history, args=(chatbot, config))
 
 prompt_template = ChatPromptTemplate.from_messages([
