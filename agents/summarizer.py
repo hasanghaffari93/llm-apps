@@ -1,30 +1,10 @@
-import asyncio
-import os
-import tempfile
-import streamlit as st
 from typing import List, Literal
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains.combine_documents.reduce import collapse_docs
-from langchain_openai import ChatOpenAI
-from langchain_groq import ChatGroq
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter, CharacterTextSplitter
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter, CharacterTextSplitter
 from langchain_core.runnables.config import RunnableConfig
-
-
-
-from langchain_openai import ChatOpenAI
-from dotenv import load_dotenv
-import os
-
 from langchain_core.prompts import ChatPromptTemplate
-
 import operator
 from typing import Annotated, List, Literal, TypedDict
-
 from langchain.chains.combine_documents.reduce import (
     acollapse_docs,
     split_list_of_docs,
@@ -33,7 +13,7 @@ from langchain_core.documents import Document
 from langgraph.constants import Send
 from langgraph.graph import END, START, StateGraph
 
-
+# Reference: https://github.com/langchain-ai/langchain/blob/master/docs/docs/tutorials/summarization.ipynb
 
 ####################
 map_template = "Write a concise summary of the following:\\n\\n{context}"
