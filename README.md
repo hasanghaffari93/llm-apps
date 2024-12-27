@@ -39,7 +39,7 @@ s
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/llm-app-suite.git
+git clone https://github.com/yourusername/llm-app-collection.git
 cd llm-app-suite
 ```
 
