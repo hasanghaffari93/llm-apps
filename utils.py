@@ -57,6 +57,7 @@ def authenticate():
             "Authenticate via",
             ["Your API Key", "Password"],
             # key="auth_type",
+            index=1,
             horizontal=True,
             label_visibility="collapsed",
             captions=["Use your own API key", "Use a password provided by the author for testing"],
