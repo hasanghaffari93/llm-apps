@@ -58,7 +58,7 @@ def stream_wrapper(stream):
         yield chunk.content   
 
 # UI Setup
-st.header("🤖 Chatbot")
+st.header(":material/chat: Chatbot")
 st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
 
 

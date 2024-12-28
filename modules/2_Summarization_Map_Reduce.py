@@ -73,7 +73,7 @@ async def summarize(is_stream):
         container.write(result["final_summary"])
 
 # UI Setup
-st.header("🤖 Large Document Summarization (Map-Reduce)")
+st.header(":material/summarize: Large Document Summarization (Map-Reduce)")
 st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
 
 # Sidebar

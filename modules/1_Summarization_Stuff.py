@@ -53,7 +53,7 @@ def load_and_collapse_pdf(pdf_file):
 
 
 # UI Setup
-st.header("🤖 PDF Summarization (Stuff)")
+st.header(":material/summarize: PDF Summarization (Stuff)")
 st.caption("🚀 Powered by LangChain | 🔥 OpenAI & Groq LLMs | 🛠️ Streamlit UI")
 
 # Sidebar

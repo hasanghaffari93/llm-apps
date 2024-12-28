@@ -107,7 +107,7 @@ def stream_wrapper(stream):
         yield chunk.content
 
 # UI Setup
-st.header("🤖 RAG")
+st.header(":material/docs: RAG")
 
 # Sidebar
 model = update_api_and_model("OpenAI")
