@@ -18,7 +18,7 @@ from utils import get_context_length_limit, update_api_and_model, authenticate, 
 
 
 @st.cache_resource(max_entries=1)
-def configure_retriever(uploaded_pdf):
+def get_vector_store(uploaded_pdf):
 
     # Read documents
     docs = []
@@ -125,13 +125,14 @@ uploaded_pdf = st.file_uploader(
 
 if not uploaded_pdf:
     st.info("Please upload a PDF document to continue.")
-    st.stop()
 
-vector_store = configure_retriever(uploaded_pdf)
+continue_run = st.session_state["valid_auth"] and uploaded_pdf
 
-graph = app(model)
+if continue_run:
+    vector_store = get_vector_store(uploaded_pdf)
+    graph = app(model)
     
-if question := st.chat_input(disabled=not st.session_state["valid_auth"]):
+if question := st.chat_input(disabled=not continue_run):
     st.chat_message(name="human").write(question)
 
     if not is_stream:
