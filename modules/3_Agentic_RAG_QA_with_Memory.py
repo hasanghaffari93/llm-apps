@@ -146,7 +146,7 @@ def app(model):
     graph_builder.set_entry_point("query_or_respond")
     graph_builder.add_conditional_edges(
         "query_or_respond",
-        tools_condition,
+        tools_condition, # Prebuilt Method: Use in the conditional_edge to route to the ToolNode if the last message has tool calls. Otherwise, route to the end.
         {END: END, "tools": "tools"},
     )
     graph_builder.add_edge("tools", "generate")
