@@ -15,14 +15,14 @@ if "api" not in st.session_state:
 
 pg = st.navigation({
     "Chatbots": [
-        st.Page("modules/0_Chatbot_LangChain.py", title="Chatbot Langchain", icon=":material/chat:")
+        st.Page("modules/0_Chatbot_LangChain.py", title="Chatbot Langchain", icon=":material/chat:"),
     ],
     "Summarization": [
         st.Page("modules/1_Summarization_Stuff.py", title="Stuff Technique", icon=":material/summarize:"),
         st.Page("modules/2_Summarization_Map_Reduce.py", title="Map-Reduce Technique", icon=":material/summarize:")
     ],
     "RAG": [
-        st.Page("modules/3_RAG.py", title="PDF Q/A", icon=":material/docs:")
+        st.Page("modules/3_Agentic_RAG_QA_with_Memory.py", title="Agentic RAG: QA with Memory", icon=":material/docs:"),
     ]
 })
 

@@ -4,25 +4,26 @@ This project is a collection of applications leveraging Large Language Models (L
 
 
 ## Features
-### 🤖 Chatbot
+### Chatbot
 - Support for multiple LLM providers (`OpenAI` and `Groq`)
 - Model selection for each provider:
     - `OpenAI`: `gpt-4o-mini`, `gpt-4-turbo`, `gpt-4o`
     - `Groq`: `llama3-70b-8192`, `llama3-8b-8192`
 - Message history with auto-trimming
 
-### 📝 Document Summarization
+### Document Summarization
 - Two summarization techniques:
   - `Stuff`: For shorter documents that fit within context window
   - `Map-Reduce`: For longer documents that exceed context limits
 - PDF document support
 
-### 🔍 RAG (Retrieval Augmented Generation)
-- PDF document question-answering
-- `FAISS` vector store for efficient similarity search
-- `OpenAI` embeddings integration
+### Retrieval Augmented Generation (RAG)
+- Agentic RAG: QA with Memory
+  - **Tool-calling**: Tool calling enables the model to decide if a retrieval step is needed. If required, user queries are rewritten based on the chat history (contextualization). If not, the model responds directly without a retrieval step (e.g., in response to a generic greeting).
+  - `FAISS` vector store for efficient similarity search
+  - `OpenAI` embeddings integration
 
-### ⚙️ Technical Features
+### Technical Features
 - Built with `Streamlit` for interactive UI
 - `LangChain` and `LangGraph` integration for LLM operations
 - Modular architecture with separate pages
@@ -32,7 +33,6 @@ This project is a collection of applications leveraging Large Language Models (L
 ## Demo App 
 
 [![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://llm-app-collection.streamlit.app/)
-s
 
 ## Setup
 
