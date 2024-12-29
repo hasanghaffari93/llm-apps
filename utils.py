@@ -163,7 +163,7 @@ def get_system_prompt(on_change: Optional[Callable]=None, args=None) -> None:
     return system_prompt
 
 def select_embedding_model(on_change: Optional[Callable]=None) -> None:
-    with st.sidebar.expander("Select Embedding Eodel"):
+    with st.sidebar.expander("Select Embedding Model"):
         st.selectbox(
             label="OpenAI Embedding Model",
             options=AppConfig.EMBEDDING_MODEL_NAMES["OpenAI"],
