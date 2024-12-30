@@ -32,7 +32,7 @@ This project is a collection of applications leveraging Large Language Models (L
 
 ## Demo App 
 
-[![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://llm-app-collection.streamlit.app/)
+[![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://llm-app.streamlit.app/)
 
 ## Setup
 
