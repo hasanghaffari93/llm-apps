@@ -19,7 +19,7 @@ class AppConfig:
     EMBEDDING_MODEL_NAMES = {
         'OpenAI': ('text-embedding-ada-002', 'text-embedding-3-small', 'text-embedding-3-large'),
     }
-    DEFAULT_MAX_TOKENS = 3000
+    DEFAULT_MAX_TOKENS = 128000
     DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant."
 
 def reset_auth():
@@ -123,7 +123,7 @@ def get_max_tokens(on_change: Optional[Callable]=None) -> None:
         step=1000,
         # key="max_tokens",
         help="Long context costs a lot!",
-        placeholder="3000",
+        placeholder="128000",
         on_change=on_change,
     )
     return max_tokens
