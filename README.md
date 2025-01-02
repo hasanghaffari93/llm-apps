@@ -4,12 +4,16 @@ This project is a collection of applications leveraging Large Language Models (L
 
 
 ## Features
-### Chatbot
+### Chatbots
 - Support for multiple LLM providers (`OpenAI` and `Groq`)
 - Model selection for each provider:
     - `OpenAI`: `gpt-4o-mini`, `gpt-4-turbo`, `gpt-4o`
     - `Groq`: `llama3-70b-8192`, `llama3-8b-8192`
 - Message history with auto-trimming
+- Audio capabilities:
+  - Voice input using OpenAI's `Whisper` for speech-to-text
+  - Text-to-speech responses using OpenAI's `TTS`
+  - Automatic audio playback of responses
 
 ### Document Summarization
 - Two summarization techniques:
