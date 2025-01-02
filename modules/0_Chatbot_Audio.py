@@ -102,14 +102,15 @@ def write_ai_message(state, chatbot, config, is_stream):
             stream = chatbot.stream(state, config, stream_mode="messages")
             output = st.write_stream(stream_wrapper(stream))
 
-            client = OpenAI(api_key=st.session_state.api_key)
-            response = client.audio.speech.create(
-                model="tts-1",
-                voice="alloy",
-                response_format="wav",
-                input=output,
-            )
-            st.audio(response.read(), autoplay=True)            
+            with st.spinner('Running Text to Speech'):
+                client = OpenAI(api_key=st.session_state.api_key)
+                response = client.audio.speech.create(
+                    model="tts-1",
+                    voice="alloy",
+                    response_format="wav",
+                    input=output,
+                )
+                st.audio(response.read(), autoplay=True)            
 
 # UI Setup
 st.header(":material/chat: Chatbot")
@@ -138,11 +139,12 @@ audio = st._bottom.audio_input("Record a voice message", disabled=not st.session
 
 if audio:
     client = OpenAI(api_key=st.session_state.api_key)
-    transcript = client.audio.transcriptions.create(
-        model="whisper-1",
-        file=audio,
-        response_format="text"
-    )
+    with st.spinner('Transcribing audio...'):
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio,
+            response_format="text"
+        )
     query = transcript
     st.chat_message(name="human").write(query)
     write_ai_message({"messages": [HumanMessage(query)]}, chatbot, config, is_stream)
