@@ -81,3 +81,8 @@ pip install -r requirements.txt
 ```sh
 streamlit run app.py
 ```
+
+## Resources
+
+- Two ways of text summarization, Stuff and Map-reduce ([link](https://python.langchain.com/docs/tutorials/summarization/))
+- Retrieval Augmented Generation (RAG) using LangChain ([link](https://python.langchain.com/docs/tutorials/qa_chat_history/))
