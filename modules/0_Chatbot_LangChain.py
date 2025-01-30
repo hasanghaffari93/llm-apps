@@ -26,7 +26,7 @@ def show_chat_history(chatbot, config):
         for msg in messages:
             st.chat_message(msg.type).write(msg.content)        
 
-@st.cache_resource(max_entries=1) # Why max_entries=1?
+@st.cache_resource(max_entries=1, ttl=3600) # Why max_entries=1?
 def create_chatbot(api: str, api_key: str, model: str, max_tokens: int, system_prompt: str):
 
     if not st.session_state["valid_auth"]:
