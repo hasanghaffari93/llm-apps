@@ -1,2 +1,2 @@
 [server]
-disconnectedSessionTTL = 30
+disconnectedSessionTTL = 3600
