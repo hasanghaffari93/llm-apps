@@ -10,8 +10,9 @@ from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages, RemoveMessage
 from utils import get_max_tokens, get_system_prompt, update_api_and_model, authenticate, stream_enabled
 import os
+from datetime import datetime
 
-os.write(1, f"Reran...\n".encode()) 
+os.write(1, f"Reran at {datetime.now()}\n".encode())
 
 if "retry" not in st.session_state:
     st.session_state["retry"] = False
