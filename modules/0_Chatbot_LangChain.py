@@ -9,6 +9,9 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages, RemoveMessage
 from utils import get_max_tokens, get_system_prompt, update_api_and_model, authenticate, stream_enabled
+import os
+
+os.write(1, f"Reran...\n".encode()) 
 
 if "retry" not in st.session_state:
     st.session_state["retry"] = False
