@@ -1,14 +1,11 @@
-# LLM App Collection
+# LLM Apps
 
-This project is a collection of applications leveraging Large Language Models (LLMs) for various tasks such as chatbots, document summarization, and retrieval-augmented generation (RAG). The applications are built using LangChain and LangGraph for the backend processing and Streamlit for the UI.
+This project includes applications leveraging Large Language Models (LLMs) for various tasks such as chatbots, document summarization, and retrieval-augmented generation (RAG). The applications are built using LangChain and LangGraph for the backend processing and Streamlit for the UI.
 
 
 ## Features
 ### Chatbots
-- Support for multiple LLM providers (`OpenAI` and `Groq`)
-- Model selection for each provider:
-    - `OpenAI`: `gpt-4o-mini`, `gpt-4-turbo`, `gpt-4o`
-    - `Groq`: `llama3-70b-8192`, `llama3-8b-8192`
+- Support for multiple LLM providers (e.g. `OpenAI` and `Groq`)
 - Message history with auto-trimming
 - Audio capabilities:
   - Voice input using OpenAI's `Whisper` for speech-to-text
@@ -31,7 +28,7 @@ This project is a collection of applications leveraging Large Language Models (L
 - Built with `Streamlit` for interactive UI
 - `LangChain` and `LangGraph` integration for LLM operations
 - Modular architecture with separate pages
-- Authentication via API key or password
+- Simple Authentication via API key or password
 
 
 ## Demo App 
@@ -57,18 +54,18 @@ PASSWORDS = ["your-password"]
 
 3. Create and activate virtual environment:
 
-Ubuntu/Linux
+Ubuntu/Linux Terminal
 ```sh
 pip install virtualenv
 virtualenv .venv
 source .venv/bin/activate
 ```
 
-Windows:
+Windows PowerShell:
 ```sh
 pip install virtualenv
 virtualenv venv
-venv\Scripts\activate.bat
+venv\Scripts\activate.ps1
 ```
 
 4. Install dependencies:
